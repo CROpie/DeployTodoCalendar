@@ -4,7 +4,7 @@ export const manifest = {
 	assets: new Set(["favicon.png"]),
 	mimeTypes: {".png":"image/png"},
 	_: {
-		client: {"start":"_app/immutable/entry/start.7bcde90e.js","app":"_app/immutable/entry/app.97a7395e.js","imports":["_app/immutable/entry/start.7bcde90e.js","_app/immutable/chunks/index.28d0c909.js","_app/immutable/chunks/singletons.53c71909.js","_app/immutable/chunks/parse.bee59afc.js","_app/immutable/entry/app.97a7395e.js","_app/immutable/chunks/index.28d0c909.js"],"stylesheets":[],"fonts":[]},
+		client: {"start":"_app/immutable/entry/start.e84bc439.js","app":"_app/immutable/entry/app.69878ec6.js","imports":["_app/immutable/entry/start.e84bc439.js","_app/immutable/chunks/index.28d0c909.js","_app/immutable/chunks/singletons.bb1d54b9.js","_app/immutable/chunks/parse.bee59afc.js","_app/immutable/entry/app.69878ec6.js","_app/immutable/chunks/index.28d0c909.js"],"stylesheets":[],"fonts":[]},
 		nodes: [
 			() => import('./nodes/0.js'),
 			() => import('./nodes/1.js'),

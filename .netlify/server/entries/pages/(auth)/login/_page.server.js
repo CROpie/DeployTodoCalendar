@@ -1,5 +1,5 @@
 import { r as redirect, f as fail } from "../../../../chunks/index.js";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import { d as db } from "../../../../chunks/database.js";
 const login = async ({ cookies, request }) => {
   console.log("** /login login +page.server.js **");
