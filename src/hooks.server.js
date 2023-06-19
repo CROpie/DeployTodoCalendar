@@ -2,6 +2,7 @@ import { db } from '$lib/database';
 
 export const handle = async ({ event, resolve }) => {
 	console.log('** handle +hooks.server.js **');
+
 	// try to retrieve the session cookie
 	const session = event.cookies.get('session');
 

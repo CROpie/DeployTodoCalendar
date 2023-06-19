@@ -1,5 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import { db } from '$lib/database';
 
 const login = async ({ cookies, request }) => {
