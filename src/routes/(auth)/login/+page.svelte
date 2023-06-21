@@ -2,11 +2,11 @@
 	import { enhance } from '$app/forms';
 	export let form;
 </script>
+
 <div class="Login">
 	<div class="login-box">
 		<form action="?/login" method="POST" use:enhance>
-			<input name="username" type="text" placeholder="username" autocomplete="off"/>
-			<input name="password" type="password" placeholder="password"/>
+			<input name="username" type="text" placeholder="username" autocomplete="off" />
 			<button type="submit">Submit</button>
 			{#if form?.invalid}
 				<p class="error">Error: Please fill out all fields.</p>
@@ -16,7 +16,6 @@
 			{/if}
 			<p class="message">*Enter default (no pass) to generate a default set of data..</p>
 		</form>
-
 	</div>
 	<footer>
 		<a href="http://www.freepik.com">Background image designed by Freepik</a>
@@ -32,17 +31,14 @@
 		border: 3px solid lightblue;
 		padding: 2rem;
 		border-radius: 0.5rem;
-
 	}
 	form {
-
-
-
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
 	}
-	input, button {
+	input,
+	button {
 		text-shadow: 2px 2px 2px black;
 		font-size: 1.5rem;
 		color: white;
@@ -51,9 +47,9 @@
 		border: 2px solid white;
 		border-radius: 0.5rem;
 		padding-left: 1rem;
-
 	}
-	input:hover, button:hover {
+	input:hover,
+	button:hover {
 		background-color: rgba(138, 43, 226, 0.7);
 	}
 	p {
