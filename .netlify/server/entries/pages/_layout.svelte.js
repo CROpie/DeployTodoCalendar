@@ -1,5 +1,4 @@
-import { c as create_ssr_component, b as subscribe, d as add_attribute, e as escape } from "../../chunks/index2.js";
-import { p as page } from "../../chunks/stores.js";
+import { c as create_ssr_component, b as add_attribute } from "../../chunks/index2.js";
 const app = "";
 const beerBear = "/_app/immutable/assets/BearbeerCrop.c0fee640.png";
 const _layout_svelte_svelte_type_style_lang = "";
@@ -8,15 +7,21 @@ const css = {
   map: null
 };
 const Layout = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let $page, $$unsubscribe_page;
-  $$unsubscribe_page = subscribe(page, (value) => $page = value);
   console.log("/ +layout.svelte");
+  let { data } = $$props;
+  let { supabase, session } = data;
+  if ($$props.data === void 0 && $$bindings.data && data !== void 0)
+    $$bindings.data(data);
   $$result.css.add(css);
-  $$unsubscribe_page();
+  ({ supabase, session } = data);
+  {
+    console.log(session);
+  }
   return `<div class="container svelte-1vbboch"><div class="header svelte-1vbboch"><div class="padding svelte-1vbboch"><img${add_attribute("src", beerBear, 0)} alt="Beer Bear" class="svelte-1vbboch"></div>
-		${$page.data.userData ? `<h2 class="svelte-1vbboch">Welcome, ${escape($page.data.userData.name)}!</h2>
-		<form action="./logout?/logout" method="POST" class="svelte-1vbboch"><button type="submit" class="svelte-1vbboch">Log Out</button></form>` : `<h2 class="svelte-1vbboch">Please log in to continue.</h2>
-		<h3 class="padding2 svelte-1vbboch">.</h3>`}</div>
+
+		${session ? `<h2 class="svelte-1vbboch">Welcome!</h2>
+			<button type="button" class="svelte-1vbboch">Log Out</button>` : `<h2 class="svelte-1vbboch">Please log in to continue.</h2>
+			<h3 class="padding2 svelte-1vbboch">.</h3>`}</div>
 
 	<div class="main svelte-1vbboch">${slots.default ? slots.default({}) : ``}</div>
 </div>`;

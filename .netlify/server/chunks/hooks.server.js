@@ -1,21 +1,23 @@
-import { d as db } from "./database.js";
+import { P as PUBLIC_SUPABASE_URL, a as PUBLIC_SUPABASE_ANON_KEY } from "./public.js";
+import { createSupabaseServerClient } from "@supabase/auth-helpers-sveltekit";
 const handle = async ({ event, resolve }) => {
-  console.log("** handle +hooks.server.js **");
-  const session = event.cookies.get("session");
-  if (!session) {
-    return await resolve(event);
-  }
-  const user = await db.user.findUnique({
-    where: { userAuthToken: session },
-    select: { username: true, id: true }
+  console.log("** hooks.server.js handle **");
+  event.locals.supabase = createSupabaseServerClient({
+    supabaseUrl: PUBLIC_SUPABASE_URL,
+    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    event
   });
-  if (user) {
-    event.locals.user = {
-      name: user.username,
-      id: user.id
-    };
-  }
-  return await resolve(event);
+  event.locals.getSession = async () => {
+    const {
+      data: { session }
+    } = await event.locals.supabase.auth.getSession();
+    return session;
+  };
+  return resolve(event, {
+    filterSerializedResponseHeaders(name) {
+      return name === "content-range";
+    }
+  });
 };
 export {
   handle
