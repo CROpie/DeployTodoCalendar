@@ -3,6 +3,8 @@
 
 	import CalendarNewTodo from './CalendarNewTodo.svelte';
 
+	export let projectListData;
+
 	/* CALENDAR GRID */
 
 	const monthList = [
@@ -103,12 +105,12 @@
 	function colourCodeTodos() {
 		const projectIDSet = new Set();
 		chosenMonthTodoList.forEach((todo) => {
-			projectIDSet.add(todo.projectID);
+			projectIDSet.add(todo.project);
 		});
 		const colourArray = [...projectIDSet];
 
 		chosenMonthTodoList.forEach((todo) => {
-			const index = colourArray.indexOf(todo.projectID);
+			const index = colourArray.indexOf(todo.project);
 			todo.colourCode = `projectColour${index}`;
 		});
 	}
@@ -216,7 +218,7 @@
 			{/each}
 
 			{#if index + 1 == newTodoTile}
-				<CalendarNewTodo {clickedDate} />
+				<CalendarNewTodo {clickedDate} {projectListData} bind:newTodoTile />
 			{/if}
 		</div>
 	{/each}
@@ -332,5 +334,17 @@
 	}
 	.projectColour1 {
 		background-color: orange;
+	}
+	.projectColour2 {
+		background-color: yellow;
+	}
+	.projectColour3 {
+		background-color: green;
+	}
+	.projectColour4 {
+		background-color: blue;
+	}
+	.projectColour5 {
+		background-color: purple;
 	}
 </style>

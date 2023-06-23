@@ -2,13 +2,31 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 
-	$: projectListData = $page.data.projectList;
-	$: userData = $page.data.userData;
+	export let projectListData;
 
 	export let clickedDate;
+	export let newTodoTile;
+
+	/* very strange
+    when the function includes newTodoTile = -1, it won't autorefresh
+    but if the function includes nothing, it will ??
+    event.update didn't seem to do anything either
+    */
+	const runUnclick = () => {
+		newTodoTile = -100;
+
+		return async (event) => {
+			await event.update({ reset: true });
+		};
+	};
 </script>
 
-<form class="calendar-todo popup" method="POST" action="testapi/todo?/addTodoToDB" use:enhance>
+<form
+	class="calendar-todo popup"
+	method="POST"
+	action="../apis/todo?/addTodoToDB"
+	use:enhance={runUnclick}
+>
 	<div class="popuptext">
 		<input
 			class="todo-input-field name"
@@ -24,7 +42,6 @@
 				<option class="dropdown-option" value={project.id}>{project.projectName}</option>
 			{/each}
 		</select>
-		<input type="hidden" name="userID" value={userData.id} />
 		<input type="hidden" name="dueDate" value={clickedDate} />
 		<button type="submit" class="submit-button">✔</button>
 	</div>

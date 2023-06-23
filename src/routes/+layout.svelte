@@ -13,7 +13,6 @@
 
 	let { supabase, session } = data;
 	$: ({ supabase, session } = data);
-	$: console.log(session);
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {

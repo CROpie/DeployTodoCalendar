@@ -40,28 +40,6 @@
 	};
 </script>
 
-<!--
-<div class="Login">
-	<div class="login-box">
-		<form action="?/login" method="POST" use:enhance>
-			<input name="username" type="text" placeholder="username" autocomplete="off" />
-			<input name="password" type="password" placeholder="password" />
-			<button type="submit">Submit</button>
-			{#if form?.invalid}
-				<p class="error">Error: Please fill out all fields.</p>
-			{/if}
-			{#if form?.credentials}
-				<p class="error">Error: Please check your credentials.</p>
-			{/if}
-			<p class="message">*Enter default (no pass) to generate a default set of data..</p>
-		</form>
-	</div>
-	<footer>
-		<a href="http://www.freepik.com">Background image designed by Freepik</a>
-	</footer>
-</div>
--->
-
 <div class="Login">
 	<div class="login-box">
 		{#if login}

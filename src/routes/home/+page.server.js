@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ locals: { supabase, getSession } }) => {
+	console.log('** /home/+page.server.js load **');
 	const session = await getSession();
 
 	if (!session) {

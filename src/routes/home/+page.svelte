@@ -154,7 +154,7 @@
 		{#if selectedView === 'List'}
 			<TodoView {filteredTodoList} {projectListData} />
 		{:else if selectedView === 'Calendar'}
-			<CalendarView {filteredTodoList} />
+			<CalendarView {filteredTodoList} {projectListData} />
 		{/if}
 	</div>
 </div>
