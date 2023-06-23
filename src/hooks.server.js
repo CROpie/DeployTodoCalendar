@@ -1,30 +1,31 @@
-import { db } from '$lib/database';
+// src/hooks.server.ts
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit';
 
 export const handle = async ({ event, resolve }) => {
-	console.log('** handle +hooks.server.js **');
-
-	// try to retrieve the session cookie
-	const session = event.cookies.get('session');
-
-	// no logged in user so do the usual thing
-	if (!session) {
-		return await resolve(event);
-	}
-
-	// find the user that matches the cookie
-	// select means only certain values are retrieved
-	const user = await db.user.findUnique({
-		where: { userAuthToken: session },
-		select: { username: true, id: true }
+	console.log('** hooks.server.js handle **');
+	event.locals.supabase = createSupabaseServerClient({
+		supabaseUrl: PUBLIC_SUPABASE_URL,
+		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+		event
 	});
 
-	// store in event.locals to be used in load functions
-	if (user) {
-		event.locals.user = {
-			name: user.username,
-			id: user.id
-		};
-	}
+	/**
+	 * "A convenience helper so we can just call await getSession() instead const { data: { session } } = await supabase.auth.getSession()"
+	
+	Store the result of event.locals.supabase.auth.getSession() session
+	to call use session = getSession()
+	*/
+	event.locals.getSession = async () => {
+		const {
+			data: { session }
+		} = await event.locals.supabase.auth.getSession();
+		return session;
+	};
 
-	return await resolve(event);
+	return resolve(event, {
+		filterSerializedResponseHeaders(name) {
+			return name === 'content-range';
+		}
+	});
 };

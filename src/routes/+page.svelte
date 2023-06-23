@@ -1,170 +1,152 @@
 <script>
-	console.log('/ +page.svelte');
-	import { afterUpdate } from 'svelte';
+	/*
+	import { enhance } from '$app/forms';
+	export let form;
+	*/
 
-    import ViewList from './components/ViewList.svelte';
-	import TimePeriodList from './components/TimePeriodList.svelte';
-	import ProjectList from './components/ProjectList.svelte';
-	import TodoView from './components/TodoView.svelte';
-    import CalendarView from './components/CalendarView.svelte';
 	export let data;
+	let { supabase } = data;
 
-	$: todoListData = data.todoList
+	let email;
+	let password;
 
-    let selectedView = 'List'
-    let selectedTimePeriod = 'All'
-	let selectedProjectID = -1;
+	let login = true;
 
-	let filteredTodoList = []
+	const handleSignIn = async () => {
+		const response = await supabase.auth.signInWithPassword({
+			email,
+			password
+		});
 
-	// Apply special strings and colours to certain dates, change the date format
-	function getDateObjects() {
-  
-        // const today = new Date('2023-12-01')
-        // can test by changing the date above, newDateFromInterval works for any interval - positive as well as negative
-        // by works: it correctly rounds up or down to the correct date
+		if (!response.error) {
+			console.log('no error so redirecting...');
+			window.location.href = '/home';
+		}
+	};
 
-        const today = new Date()
-        let todayObj = {
-            year: today.getFullYear(),
-            month: today.getMonth(),
-            date: today.getDate(),
-        }
+	const handleSignUp = async () => {
+		console.log(location);
+		await supabase.auth.signUp({
+			email,
+			password,
+			options: {
+				emailRedirectTo: `${location.origin}/autologin`
+			}
+		});
+	};
 
-        let todayFormatted = dateObjToFormattedDateString(todayObj)
-        let tomorrowFormatted = newDateFromInterval(todayObj, 1)
-        let dayAfterFormatted = newDateFromInterval(todayObj, 2)
-
-        return { todayFormatted, tomorrowFormatted, dayAfterFormatted }
-    }
-    function newDateFromInterval(dateObj, interval) {
-        let newDateObj = structuredClone(dateObj)
-        newDateObj.date = parseInt(newDateObj.date) + interval
-        const newDate = new Date(newDateObj.year, newDateObj.month, newDateObj.date)
-
-        let roundedNewDateObj = {
-            year: newDate.getFullYear(),
-            month: newDate.getMonth(),
-            date: newDate.getDate(),
-        }
-        const formattedDate = dateObjToFormattedDateString(roundedNewDateObj)
-        return formattedDate
-    }
-    function dateObjToFormattedDateString(dateObj) {
-        let month2dec = (parseInt(dateObj.month) + 1).toString().padStart(2, 0)
-        let date2dec = (parseInt(dateObj.date)).toString().padStart(2, 0)
-        const formattedDate = `${dateObj.year}-${month2dec}-${date2dec}`
-        return formattedDate
-    }
-    function prettifyDate() {
-        // (colour comes from using todo.dateFlag as a class in Todo.svelte)
-        // old: grey with date as Month DD, YYYY
-        // today: red with 'today'
-        // tomorrow: orange with 'tomorrow'
-        // day after tomorrow: green with 'day after tomorrow'
-        // future: black with date as Month DD, YYYY
-        if (!filteredTodoList) {
-            return
-        }
-        const dateObjects = getDateObjects()
-        filteredTodoList.forEach((todo) => {
-            if (todo.dueDate == dateObjects.todayFormatted) {
-                todo.prettyDate = "Today"
-                todo.dateFlag = "today"
-            } else if (todo.dueDate == dateObjects.tomorrowFormatted) {
-                todo.prettyDate = "Tomorrow"
-                todo.dateFlag = "tomorrow"
-            } else if (todo.dueDate == dateObjects.dayAfterFormatted) {
-                todo.prettyDate = "Day After Tomorrow"
-                todo.dateFlag = "dayaftertomorrow"
-            } else if (todo.dueDate < dateObjects.todayFormatted) {
-                let date = new Date(todo.dueDate)
-                let dateString = new Intl.DateTimeFormat('en', { dateStyle: 'long' }).format(date)
-                todo.prettyDate = dateString
-                todo.dateFlag = "past"
-            } else {
-                let date = new Date(todo.dueDate)
-                let dateString = new Intl.DateTimeFormat('en', { dateStyle: 'long' }).format(date)
-                todo.prettyDate = dateString
-            }
-        })
-    }
-	function filterByDate() {
-        // get strings for today's date and a date a week from today
-		const today = new Date()
-		let todayObj = {
-            year: today.getFullYear(),
-            month: today.getMonth(),
-            date: today.getDate(),
-
-        }
-        const todayFormatted = newDateFromInterval(todayObj, 0);
-        const oneWeekFormatted = newDateFromInterval(todayObj, 7);
-
-        if (selectedTimePeriod === 'week') {
-            filteredTodoList = filteredTodoList.filter((todo) => {
-                if (todo.dueDate >= todayFormatted && todo.dueDate < oneWeekFormatted) {
-                    return true;
-                }
-            });
-        } else if (selectedTimePeriod === 'day') {
-            filteredTodoList = filteredTodoList.filter((todo) => {
-                if (todo.dueDate == todayFormatted) {
-                    return true;
-                }
-            });
-        } else if (selectedTimePeriod === 'past') {
-            filteredTodoList = filteredTodoList.filter((todo) => {
-                if (todo.dueDate < todayFormatted) {
-                    return true;
-                }
-            });
-        }
-    }
-	// filter the todos by selected project and selected time period
-	function filterTodoList() {
-        // first, filter by project
-        if (selectedProjectID == -1) {
-            filteredTodoList = todoListData;
-        } else {
-            filteredTodoList = todoListData.filter((todo) => todo.projectID == selectedProjectID)
-        }
-		filterByDate()
-    }
-	// sort the filtered todos by date
-	function sortTodosByDate() {
-        filteredTodoList = filteredTodoList.sort((a, b) =>
-            a.dueDate > b.dueDate ? 1 : -1
-        );
-    }	
-    afterUpdate(() => {
-		console.log("** / +page.svelte afterUpdate **")
-		filterTodoList()
-		prettifyDate()
-		sortTodosByDate()
-	})
+	const toggle = () => {
+		login = !login;
+	};
 </script>
 
-<div class="full-container">
-	<div class="side-panel">
-        <ViewList bind:selectedView />
-		<TimePeriodList bind:selectedTimePeriod />
-		<ProjectList bind:selectedProjectID />
+<!--
+<div class="Login">
+	<div class="login-box">
+		<form action="?/login" method="POST" use:enhance>
+			<input name="username" type="text" placeholder="username" autocomplete="off" />
+			<input name="password" type="password" placeholder="password" />
+			<button type="submit">Submit</button>
+			{#if form?.invalid}
+				<p class="error">Error: Please fill out all fields.</p>
+			{/if}
+			{#if form?.credentials}
+				<p class="error">Error: Please check your credentials.</p>
+			{/if}
+			<p class="message">*Enter default (no pass) to generate a default set of data..</p>
+		</form>
 	</div>
-	<div class="view-container">
-        {#if selectedView === 'List'}
-            <TodoView { filteredTodoList }/>
-        {:else if selectedView === 'Calendar'}
-            <CalendarView { filteredTodoList } />
-        {/if}
-    </div>
+	<footer>
+		<a href="http://www.freepik.com">Background image designed by Freepik</a>
+	</footer>
+</div>
+-->
+
+<div class="Login">
+	<div class="login-box">
+		{#if login}
+			<form on:submit|preventDefault={handleSignIn}>
+				<input name="email" bind:value={email} />
+				<input type="password" name="password" bind:value={password} />
+				<button>Sign in</button>
+			</form>
+			<div class="toggleContainer">
+				<button class="outline secondary toggle" on:click={toggle}>Need to sign up?</button>
+			</div>
+		{:else}
+			<form on:submit|preventDefault={handleSignUp}>
+				<input name="email" bind:value={email} />
+				<input type="password" name="password" bind:value={password} />
+				<button>Sign up</button>
+			</form>
+			<div class="toggleContainer">
+				<button class="outline secondary toggle" on:click={toggle}>Want to sign in?</button>
+			</div>
+		{/if}
+	</div>
+
+	<footer>
+		<a href="http://www.freepik.com">Background image designed by Freepik</a>
+	</footer>
 </div>
 
 <style>
-	.full-container {
-		display: grid;
-		grid-template-columns: 250px 1fr;
+	.login-box {
+		flex: auto;
 
+		margin: 5rem auto;
+		width: 50%;
+		border: 3px solid lightblue;
+		padding: 2rem;
+		border-radius: 0.5rem;
 	}
-
+	form {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+	input,
+	button {
+		text-shadow: 2px 2px 2px black;
+		font-size: 1.5rem;
+		color: white;
+		background-color: transparent;
+		padding: 0.5rem;
+		border: 2px solid white;
+		border-radius: 0.5rem;
+		padding-left: 1rem;
+	}
+	input:hover,
+	button:hover {
+		background-color: rgba(138, 43, 226, 0.7);
+	}
+	p {
+		text-align: center;
+	}
+	.message {
+		font-size: 1rem;
+		color: orange;
+		text-shadow: 2px 2px 2px black;
+		font-weight: 700;
+	}
+	.error {
+		color: red;
+		font-size: 0.75rem;
+	}
+	footer {
+		text-align: center;
+		height: 1rem;
+		color: white;
+	}
+	a {
+		color: white;
+		font-size: 0.75rem;
+	}
+	.toggle {
+		margin-top: 2rem;
+	}
+	.toggleContainer {
+		display: flex;
+		justify-content: center;
+	}
 </style>

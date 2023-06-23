@@ -2,73 +2,92 @@
 	console.log('Component ProjectList');
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
-	import { blur } from 'svelte/transition'
+	import { blur } from 'svelte/transition';
 
-	$: projectListData = $page.data.projectList;
-	$: userData = $page.data.userData
+	export let projectListData;
 
-	export let selectedProjectID
-
+	export let selectedProjectID;
 	let isNewProject = false;
 
 	const closeNewProject = () => {
 		isNewProject = false;
-	}
-	
+		return async (event) => {
+			await event.update({ reset: false });
+			// can redirect if thats what you want
+		};
+	};
+
 	const clickNewProject = () => {
-        isNewProject = true;
-        window.addEventListener('mouseup', cancelInputProjectByClick);
-    }
-    function cancelInputProjectByClick(event) {
-        if (event.target != document.querySelector('.project-input-field')) {
-            window.removeEventListener('mouseup', cancelInputProjectByClick);
-            isNewProject= false
-        }
-    }
-	// doesn't work for some reason, not selecting 'All' after a delete
-	const setAll = () => {
-		console.log('hello??', selectedProjectID)
-		if (selectedProjectID != -1) {
-			console.log('huh??', selectedProjectID)
-			selectedProjectID = -1
+		isNewProject = true;
+		window.addEventListener('mouseup', cancelInputProjectByClick);
+	};
+	function cancelInputProjectByClick(event) {
+		if (event.target != document.querySelector('.project-input-field')) {
+			window.removeEventListener('mouseup', cancelInputProjectByClick);
+			isNewProject = false;
 		}
 	}
 
+	// doesn't work for some reason, not selecting 'All' after a delete
+	const setAll = () => {
+		console.log('hello??', selectedProjectID);
+		if (selectedProjectID != -1) {
+			console.log('huh??', selectedProjectID);
+			selectedProjectID = -1;
+		}
+		/* not necessary here, no noticable difference
+		return async (event) => {
+			await event.update({ reset: false });
+		};
+		*/
+	};
 </script>
 
 <div class="ProjectList">
 	<ul>
-		<li on:click={() => selectedProjectID = -1}>
-            <div class="list-item" class:selected={selectedProjectID === -1}>All</div>
-        </li>
+		<li on:click={() => (selectedProjectID = -1)}>
+			<div class="list-item" class:selected={selectedProjectID === -1}>All</div>
+		</li>
 
 		{#if projectListData}
-        {#each projectListData as project (project.id)}
-        <li on:click={() => selectedProjectID = project.id} out:blur>
-			<form class="form-container" method="POST" action="../testapi/project?/removeProjectFromDB" use:enhance>
-            	<div class="list-item" class:selected={selectedProjectID === project.id}>{project.projectName}</div>
-				<input name="projectID" type="hidden" value={project.id}>
-				<button class="del-button" type="submit" on:click={setAll}>✘</button>
-			</form>
-        </li>
-        {/each}
+			{#each projectListData as project (project.id)}
+				<li on:click={() => (selectedProjectID = project.id)} out:blur>
+					<form
+						class="form-container"
+						method="POST"
+						action="../apis/project?/removeProjectFromDB"
+						use:enhance
+					>
+						<div class="list-item" class:selected={selectedProjectID === project.id}>
+							{project.projectName}
+						</div>
+						<input name="projectID" type="hidden" value={project.id} />
+						<button class="del-button" type="submit" on:click={setAll}>✘</button>
+					</form>
+				</li>
+			{/each}
 		{/if}
-    
+
 		{#if isNewProject}
-		<li class="list-new-project-container">
-			<form method="POST" action="../testapi/project?/addProjectToDB" use:enhance={closeNewProject}>
-				<input class="project-input-field" name="projectName" type="text" autocomplete="off" autofocus required/>
-				<input name="userID" type="hidden" value={userData.id}>
-			</form>
-		</li>
+			<li class="list-new-project-container">
+				<form method="POST" action="../apis/project?/addProjectToDB" use:enhance={closeNewProject}>
+					<input
+						class="project-input-field"
+						name="projectName"
+						type="text"
+						autocomplete="off"
+						autofocus
+						required
+					/>
+				</form>
+			</li>
 		{/if}
 
 		<li class="list-new-project">
-	    	<div class="list-item">
+			<div class="list-item">
 				<div class="new-project-button" on:click={clickNewProject}>New Project</div>
 			</div>
 		</li>
-
 	</ul>
 </div>
 
@@ -78,9 +97,9 @@
 		padding: 0rem 1rem;
 	}
 	ul {
-	list-style-type: none;
-	padding: 0;
-	margin: 0;
+		list-style-type: none;
+		padding: 0;
+		margin: 0;
 	}
 	li {
 		cursor: pointer;
@@ -92,7 +111,7 @@
 	}
 	li:hover {
 		background-color: rgba(138, 43, 226, 0.7);
-    }
+	}
 	.form-container {
 		display: flex;
 		justify-content: space-between;
@@ -105,8 +124,8 @@
 	.del-button {
 		border: none;
 		outline: none;
-        font-size: 1.5rem;
-        visibility: hidden;
+		font-size: 1.5rem;
+		visibility: hidden;
 		background-color: transparent;
 		color: white;
 		text-shadow: 2px 2px 2px black;
@@ -115,10 +134,10 @@
 		color: red;
 	}
 	li:hover .del-button,
-    .del-button:hover {
-    visibility: visible;
-	cursor: crosshair;
-    } 
+	.del-button:hover {
+		visibility: visible;
+		cursor: crosshair;
+	}
 
 	/* NEW PROJECT */
 	.project-input-field {

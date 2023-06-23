@@ -1,27 +1,48 @@
 <script>
 	console.log('/ +layout.svelte');
 
- 	import '../app.css'
+	import { invalidate } from '$app/navigation';
+	import { onMount } from 'svelte';
+
+	import '../app.css';
 	import beerBear from '$lib/images/BearbeerCrop.png';
 
-	import { page } from '$app/stores'
+	import { page } from '$app/stores';
 
+	export let data;
+
+	let { supabase, session } = data;
+	$: ({ supabase, session } = data);
+	$: console.log(session);
+
+	onMount(() => {
+		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
+			if (_session?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth');
+			}
+		});
+
+		return () => data.subscription.unsubscribe();
+	});
+
+	const handleSignOut = async () => {
+		await supabase.auth.signOut();
+		window.location.href = '/';
+	};
 </script>
 
 <div class="container">
 	<div class="header">
-
 		<div class="padding">
-			<img src={beerBear} alt="Beer Bear">
+			<img src={beerBear} alt="Beer Bear" />
 		</div>
-		{#if $page.data.userData}
-		<h2>Welcome, {$page.data.userData.name}!</h2>
-		<form action="./logout?/logout" method="POST">
-			<button type="submit">Log Out</button>
-		</form>
+
+		{#if session}
+			<h2>Welcome!</h2>
+			<button type="button" on:click={handleSignOut}>Log Out</button>
 		{:else}
-		<h2>Please log in to continue.</h2>
-		<h3 class="padding2">.</h3>
+			<h2>Please log in to continue.</h2>
+			<h3 class="padding2">.</h3>
 		{/if}
 	</div>
 
@@ -29,6 +50,7 @@
 		<slot />
 	</div>
 </div>
+
 <style>
 	* {
 		margin: 0;
